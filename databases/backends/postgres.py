@@ -5,6 +5,7 @@ from collections.abc import Mapping
 import asyncpg
 from sqlalchemy.dialects.postgresql import pypostgresql
 from sqlalchemy.engine.interfaces import Dialect
+from sqlalchemy.sql.sqltypes import JSON
 from sqlalchemy.sql import ClauseElement
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.types import TypeEngine
@@ -187,7 +188,7 @@ class PostgresConnection(ConnectionBackend):
 
         processors = compiled._bind_processors
         args = [
-            processors[key](val) if key in processors else val
+            processors[key](val) if key in processors and not isinstance(compiled.binds[key].type, JSON.JSONPathType) else val
             for key, val in compiled_params
         ]
 
